@@ -131,7 +131,7 @@
         <div class="grid">
             <button class="item-btn" onclick="add('Masala maggi', 70)">Masala maggi <br><span class="price-tag">₹70</span></button>
             <button class="item-btn" onclick="add('Vegetable maggi', 90)">Vegetable maggi <br><span class="price-tag">₹90</span></button>
-            <button class="item-btn" onclick="add('Schezwan maggi', 90)">Schezwan maggi <br><span class="price-tag">₹90</span></button>
+            <button class="item-btn" onclick="add('Schezwan maggi', 80)">Schezwan maggi <br><span class="price-tag">₹80</span></button>
         </div>
 
         <div class="category-header">TEA</div>
@@ -287,8 +287,12 @@
         lastSettledTime = snapshot.val() || 0;
     });
 
+    // ১. আপডেট: রাত ১২টা থেকে ভোর ৫টা পর্যন্ত যা বিক্রি হবে, তা আগের দিনের তারিখ অনুযায়ী গণনা করা হবে
     function getTodayString() {
         let now = new Date();
+        if (now.getHours() < 5) {
+            now.setDate(now.getDate() - 1);
+        }
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     }
 
@@ -423,6 +427,7 @@
         showHistory();
     }
 
+    // ২. আপডেট: Settlement করলে Active Session-এর সময়সীমা নতুন করে সেভ হবে এবং সেল পুনরায় ০ থেকে গণনা শুরু হবে
     function confirmSettlement() {
         let activeOrders = orders.filter(ord => (ord.timestamp || 0) > lastSettledTime);
         let sessionTotal = activeOrders.reduce((acc, curr) => acc + curr.total, 0);
@@ -443,7 +448,7 @@
         db.ref('cafeSettlements/' + id).set(settlementData);
 
         closeSettlementModal();
-        customAlert("Sale Settled Live & Recorded!");
+        customAlert("Sale Settled Live & Recorded! Active sale reset to ₹0.");
     }
 
     function updateHoldCount() { document.getElementById('holdCount').innerText = heldOrders.length; }
@@ -477,18 +482,20 @@
         document.getElementById('modal').style.display = 'flex';
     }
 
+    // আপডেট: Settlement করার পর থেকে চলতি সেলের হিসাব দেখানো
     function openTotalSaleModal() {
         let todayStr = getTodayString();
         document.getElementById('modalTitle').innerText = 'Sale Analytics';
 
-        let todayOrders = orders.filter(ord => ord.date === todayStr);
-        let todayTotal = todayOrders.reduce((acc, curr) => acc + curr.total, 0);
+        // বর্তমান সেশনের (শেষ সেটেলমেন্টের পরের) বিল ও সেল
+        let currentSessionOrders = orders.filter(ord => (ord.timestamp || 0) > lastSettledTime);
+        let activeSessionTotal = currentSessionOrders.reduce((acc, curr) => acc + curr.total, 0);
         
         let containerHtml = `
             <div class="analytics-card" style="background:#fff3e0; border-color:#ffe0b2;">
-                <div class="analytics-title" style="color:#e65100;">Today's Total Sale</div>
-                <div class="analytics-amount" style="color:#d32f2f;">₹${todayTotal}</div>
-                <small style="color:#666;">Total Bills Today: <b>${todayOrders.length}</b></small>
+                <div class="analytics-title" style="color:#e65100;">Active Sale (Unsettled)</div>
+                <div class="analytics-amount" style="color:#d32f2f;">₹${activeSessionTotal}</div>
+                <small style="color:#666;">Active Bills Count: <b>${currentSessionOrders.length}</b></small>
             </div>
 
             <div class="analytics-card">
