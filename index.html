@@ -50,7 +50,6 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; width: 92%; max-width: 380px; max-height: 82vh; padding: 15px; border-radius: 10px; overflow-y: auto; border: 2px solid #2e7d32; position: relative; z-index: 1001; }
         
-        /* Modal Header Style with X Close Icon */
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 10px; }
         .modal-header h3 { margin: 0; color: #2e7d32; font-size: 16px; }
         .close-icon { font-size: 20px; font-weight: bold; color: #dc3545; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px; }
@@ -64,7 +63,7 @@
         .restore-btn { background: #28a745; color: white; border: none; padding: 5px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; flex: 1; }
         .delete-btn { background: #dc3545; color: white; border: none; padding: 5px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; flex: 1; }
         
-        .alert-box { background: white; padding: 16px; border-radius: 8px; text-align: center; max-width: 300px; width: 85%; border: 2px solid #2e7d32; position: relative; z-index: 2000; }
+        .alert-box { background: white; padding: 16px; border-radius: 8px; text-align: center; max-width: 300px; width: 85%; border: 2px solid #2e7d32; position: relative; z-index: 5000; }
         .alert-ok-btn { background: #2e7d32; color: white; border: none; padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; }
         .alert-cancel-btn { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; margin-left: 5px; }
         .pass-input { width: 90%; padding: 6px; font-size: 13px; margin-bottom: 8px; border-radius: 4px; border: 1px solid #ccc; text-align: center; }
@@ -87,6 +86,10 @@
         .cal-day { background: #f0f0f0; padding: 7px 0; border-radius: 4px; cursor: pointer; font-weight: bold; color: #333; }
         .cal-day:active, .cal-day.selected { background: #2e7d32; color: white; }
         .cal-day.empty { background: transparent; cursor: default; }
+
+        /* Collapsible Date Folder Styles */
+        .date-folder-btn { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #2e7d32; padding: 10px; width: 100%; text-align: left; font-weight: bold; font-size: 13px; border-radius: 8px; cursor: pointer; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .date-folder-content { display: none; padding: 8px 0; border-left: 2px dashed #2e7d32; margin-left: 6px; padding-left: 8px; }
     </style>
 </head>
 <body>
@@ -175,7 +178,6 @@
 
 <div id="modal" class="modal-overlay">
     <div class="modal-content">
-        <!-- Top Close (✖) Button Container -->
         <div class="modal-header">
             <h3 id="modalTitle">List</h3>
             <span class="close-icon" onclick="closeModal()">✖</span>
@@ -186,7 +188,6 @@
     </div>
 </div>
 
-<!-- Custom Calendar Modal Popup -->
 <div id="calendarModal" class="modal-overlay" style="z-index: 4000;">
     <div class="modal-content" style="max-width: 320px;">
         <div class="calendar-box">
@@ -201,7 +202,7 @@
     </div>
 </div>
 
-<div id="alertModal" class="modal-overlay" style="z-index: 5000;">
+<div id="alertModal" class="modal-overlay">
     <div class="alert-box">
         <p id="alertMessage">Notification Message</p>
         <button class="alert-ok-btn" onclick="closeAlert()">OK</button>
@@ -252,12 +253,12 @@
     let selectedOrderForDelete = null;
     
     let orders = [];
+    let archivedOrders = {};
     let heldOrders = [];
     let cancelledOrders = [];
     let settlementHistory = [];
     let lastSettledTime = 0;
 
-    // Calendar Global Variables
     let activeCalTargetInputId = '';
     let calCurrentYear = new Date().getFullYear();
     let calCurrentMonth = new Date().getMonth();
@@ -275,6 +276,10 @@
     db.ref('cafeOrders').on('value', (snapshot) => {
         let val = snapshot.val();
         orders = val ? Object.values(val).filter(item => item && typeof item === 'object') : [];
+    });
+
+    db.ref('cafeArchivedHistory').on('value', (snapshot) => {
+        archivedOrders = snapshot.val() || {};
     });
 
     db.ref('cafeHeldOrders').on('value', (snapshot) => {
@@ -442,15 +447,22 @@
         let sessionTotal = activeOrders.reduce((acc, curr) => acc + curr.total, 0);
         let now = new Date();
         let id = Date.now();
+        let todayDate = getTodayString();
 
         let settlementData = {
             id: id,
-            date: getTodayString(),
+            date: todayDate,
             time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             totalBills: activeOrders.length,
             totalAmount: sessionTotal,
             timestamp: id
         };
+
+        // Transfer active orders to Archived History by Date
+        activeOrders.forEach(ord => {
+            db.ref(`cafeArchivedHistory/${ord.date}/${ord.id}`).set(ord);
+            db.ref('cafeOrders/' + ord.id).remove();
+        });
 
         lastSettledTime = id;
         db.ref('cafeLastSettled').set(lastSettledTime);
@@ -475,20 +487,84 @@
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
     function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; }
 
+    // Unified Date-wise Folder Bill History View
     function showHistory() {
-        document.getElementById('modalTitle').innerText = 'All Saved Bills (Live Cloud)';
+        document.getElementById('modalTitle').innerText = 'Bill History (By Date)';
         let listDiv = document.getElementById('modalList');
         document.getElementById('modalFilterContainer').innerHTML = '';
-        if (orders.length === 0) { listDiv.innerHTML = '<p style="text-align:center;">No bills found.</p>'; } 
-        else {
-            let html = '';
-            [...orders].reverse().forEach((ord) => {
-                let itemsList = (ord.items || []).map(i => `<li><span>• ${i.name} x${i.qty}</span> <span>₹${i.price * i.qty}</span></li>`).join('');
-                html += `<div class="bill-item"><b>Date: ${ord.date} (${ord.time})</b><ul class="history-item-list">${itemsList}</ul><div style="color:#d32f2f; font-weight:bold; text-align:right;">Total: ₹${ord.total}</div><button class="delete-btn" style="width:100%; margin-top:6px;" onclick="openPasswordModal(${ord.id})">Cancel Bill</button></div>`;
+        
+        let groupedByDate = {};
+
+        // 1. Map Active Orders by Date
+        orders.forEach(ord => {
+            let d = ord.date || getTodayString();
+            if (!groupedByDate[d]) groupedByDate[d] = [];
+            groupedByDate[d].push(ord);
+        });
+
+        // 2. Map Archived Orders by Date
+        Object.keys(archivedOrders).forEach(d => {
+            if (!groupedByDate[d]) groupedByDate[d] = [];
+            let archivedList = Object.values(archivedOrders[d] || {});
+            archivedList.forEach(ord => {
+                // Prevent duplicates if already present
+                if (!groupedByDate[d].some(existing => existing.id === ord.id)) {
+                    groupedByDate[d].push(ord);
+                }
             });
-            listDiv.innerHTML = html;
+        });
+
+        let sortedDates = Object.keys(groupedByDate).sort().reverse();
+
+        if (sortedDates.length === 0) {
+            listDiv.innerHTML = '<p style="text-align:center; font-size:12px; color:#777;">No bills recorded yet.</p>';
+            document.getElementById('modal').style.display = 'flex';
+            return;
         }
+
+        let html = '';
+        sortedDates.forEach((dateStr, idx) => {
+            let dayBills = groupedByDate[dateStr];
+            let dayTotal = dayBills.reduce((sum, b) => sum + (b.total || 0), 0);
+
+            html += `
+                <button class="date-folder-btn" onclick="toggleFolder('folder-${idx}')">
+                    <span>📅 ${dateStr} (${dayBills.length} Bills)</span>
+                    <span>₹${dayTotal} ▾</span>
+                </button>
+                <div id="folder-${idx}" class="date-folder-content">`;
+            
+            // Show latest bills on top inside the folder
+            [...dayBills].reverse().forEach((ord) => {
+                let itemsList = (ord.items || []).map(i => `<li><span>• ${i.name} x${i.qty}</span> <span>₹${i.price * i.qty}</span></li>`).join('');
+                let isUnsettled = (ord.timestamp || 0) > lastSettledTime;
+                
+                html += `
+                    <div class="bill-item" style="background:#fff;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <b>Time: ${ord.time}</b>
+                            ${isUnsettled ? '<span style="color:#d32f2f; font-size:10px; font-weight:bold; background:#ffebee; padding:2px 5px; border-radius:4px;">Unsettled</span>' : '<span style="color:#2e7d32; font-size:10px; font-weight:bold; background:#e8f5e9; padding:2px 5px; border-radius:4px;">Settled</span>'}
+                        </div>
+                        <ul class="history-item-list">${itemsList}</ul>
+                        <div style="color:#2e7d32; font-weight:bold; text-align:right;">Total: ₹${ord.total}</div>
+                        ${isUnsettled ? `<button class="delete-btn" style="width:100%; margin-top:6px;" onclick="openPasswordModal(${ord.id})">Cancel Bill</button>` : ''}
+                    </div>`;
+            });
+
+            html += `</div>`;
+        });
+
+        listDiv.innerHTML = html;
         document.getElementById('modal').style.display = 'flex';
+    }
+
+    function toggleFolder(id) {
+        let el = document.getElementById(id);
+        if (el.style.display === "block") {
+            el.style.display = "none";
+        } else {
+            el.style.display = "block";
+        }
     }
 
     function openTotalSaleModal() {
@@ -527,7 +603,6 @@
         document.getElementById('modal').style.display = 'flex';
     }
 
-    // Custom Calendar Logic
     function openCustomCalendar(inputId) {
         activeCalTargetInputId = inputId;
         let currentVal = document.getElementById(inputId).value;
@@ -606,7 +681,19 @@
             return;
         }
 
-        let filtered = orders.filter(ord => ord.date >= startVal && ord.date <= endVal);
+        let allBills = [...orders];
+        Object.keys(archivedOrders).forEach(d => {
+            if (archivedOrders[d]) {
+                let list = Object.values(archivedOrders[d]);
+                list.forEach(item => {
+                    if (!allBills.some(b => b.id === item.id)) {
+                        allBills.push(item);
+                    }
+                });
+            }
+        });
+
+        let filtered = allBills.filter(ord => ord.date >= startVal && ord.date <= endVal);
         let grandTotal = filtered.reduce((acc, curr) => acc + curr.total, 0);
 
         let resultHtml = `
