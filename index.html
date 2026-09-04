@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FUCHKA CAFE POS</title>
+    <title>Fuchka Cafe POS</title>
 
     <!-- Firebase Core & Database -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -12,224 +12,40 @@
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; padding: 10px; background: #dce4ec; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .app-container { width: 100%; max-width: 420px; height: 98vh; max-height: 870px; background: white; padding: 14px; border-radius: 16px; border: 3px solid #2e7d32; box-shadow: 0 8px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; position: relative; }
-        .brand-header-box { background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 50%, #880e4f 100%); border: 2px solid #ffd700; border-radius: 12px; padding: 10px 8px; margin-bottom: 10px; text-align: center; box-shadow: 0 4px 10px rgba(183, 28, 28, 0.3); flex-shrink: 0; }
-        .brand-header-box h1 { color: #ffffff; margin: 0; font-size: 22px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
-        .brand-header-box .tagline { color: #ffd700; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-top: 2px; }
-        .sync-status { font-size: 11px; color: #a5d6a7; margin-top: 4px; font-weight: bold; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; }
-        .menu-scroll-area { flex: 1; overflow-y: auto; padding-right: 4px; margin-bottom: 6px; }
-        .category-header { border-bottom: 2px solid #2e7d32; padding-bottom: 3px; color: #2e7d32; margin-top: 10px; margin-bottom: 8px; font-size: 14px; font-weight: 800; text-transform: uppercase; }
+        .app-container { width: 100%; max-width: 420px; height: 98vh; max-height: 870px; background: #eef2f6; padding: 12px; border-radius: 16px; border: 3px solid #1e293b; box-shadow: 0 8px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; position: relative; }
+        
+        .brand-header-box { background: #0f172a; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; color: white; }
+        .brand-header-box h1 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        .brand-header-box .tagline { color: #94a3b8; font-size: 11px; margin-top: 2px; }
+
+        /* Menu Container Style */
+        .menu-scroll-area { flex: 1; overflow-y: auto; padding-right: 2px; }
+        .category-header { font-size: 11px; font-weight: 800; color: #38bdf8; background: #0f172a; padding: 5px 8px; border-radius: 6px; margin: 10px 0 6px 0; text-transform: uppercase; letter-spacing: 0.5px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .item-btn { background: #ffffff; color: #333; border: 1.5px solid #2e7d32; padding: 8px 4px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; text-align: center; }
-        .item-btn:active { background: #2e7d32; color: white; transform: scale(0.98); }
-        .price-tag { color: #d32f2f; font-weight: bold; }
-        .bottom-fixed-area { flex-shrink: 0; border-top: 1px solid #ccc; padding-top: 6px; background: #fff; }
-        #receipt { background: #f9f9f9; padding: 8px; border-radius: 8px; border: 1px solid #ccc; height: 95px; overflow-y: auto; font-size: 12px; }
-        .receipt-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dotted #ddd; padding-bottom: 3px; }
-        .qty-controls { display: flex; align-items: center; gap: 6px; }
-        .qty-btn { background: #2e7d32; color: white; border: none; width: 22px; height: 22px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .qty-btn.minus { background: #ff9800; }
-        .qty-num { font-weight: bold; font-size: 12px; color: #d32f2f; }
-        .item-price { font-weight: bold; width: 45px; text-align: right; }
-        .total { font-size: 15px; font-weight: bold; color: #d32f2f; margin-top: 4px; text-align: right; border-top: 2px solid #2e7d32; padding-top: 2px; }
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 6px; }
-        .action-btn { color: white; border: none; padding: 7px 4px; font-size: 11px; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; text-align: center; }
-        .save-btn { background: #28a745; }
-        .hold-btn { background: #ffc107; color: #333; }
-        .view-hold-btn { background: #fd7e14; }
-        .history-btn { background: #17a2b8; }
-        .cancel-list-btn { background: #dc3545; }
-        .reset-btn { background: #6c757d; }
-        .settle-btn { background: #b71c1c; }
-        .settle-history-btn { background: #007bff; }
-        .total-sale-btn { background: #6f42c1; grid-column: span 2; }
-        
-        .developer-footer { text-align: center; margin-top: 8px; font-size: 11px; color: #555; font-weight: 600; border-top: 1px dashed #ddd; padding-top: 4px; }
-        .developer-footer span { color: #2e7d32; font-weight: 800; }
+        .item-btn { background: white; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 11px; color: #0f172a; cursor: pointer; text-align: left; display: flex; flex-direction: column; justify-content: space-between; min-height: 55px; }
+        .price-tag { color: #ef4444; font-size: 12px; font-weight: 800; margin-top: 4px; }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; width: 92%; max-width: 380px; max-height: 82vh; padding: 15px; border-radius: 10px; overflow-y: auto; border: 2px solid #2e7d32; position: relative; z-index: 1001; }
-        
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 10px; }
-        .modal-header h3 { margin: 0; color: #2e7d32; font-size: 16px; }
-        .close-icon { font-size: 20px; font-weight: bold; color: #dc3545; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px; }
-        .close-icon:hover { background: #ffebee; }
-
-        .close-btn { background: #6c757d; width: 100%; padding: 8px; margin-top: 10px; border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        .bill-item { border: 1px solid #e0e0e0; background: #fafafa; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 12px; }
-        .history-item-list { margin: 4px 0; padding-left: 0; list-style: none; }
-        .history-item-list li { padding: 2px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; }
-        .btn-group { display: flex; gap: 6px; margin-top: 6px; }
-        .restore-btn { background: #28a745; color: white; border: none; padding: 5px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; flex: 1; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 5px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; flex: 1; }
-        
-        .alert-box { background: white; padding: 16px; border-radius: 8px; text-align: center; max-width: 300px; width: 85%; border: 2px solid #2e7d32; position: relative; z-index: 5000; }
-        .alert-ok-btn { background: #2e7d32; color: white; border: none; padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; }
-        .alert-cancel-btn { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; margin-left: 5px; }
-        .pass-input { width: 90%; padding: 6px; font-size: 13px; margin-bottom: 8px; border-radius: 4px; border: 1px solid #ccc; text-align: center; }
-
-        .analytics-card { background: #f0f4f8; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #d0dbe5; text-align: center; }
-        .analytics-title { font-size: 11px; color: #555; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        .analytics-amount { font-size: 24px; color: #2e7d32; font-weight: 800; margin: 4px 0; }
-        .date-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: left; margin: 8px 0; }
-        .date-field label { font-size: 10px; font-weight: bold; color: #444; display: block; margin-bottom: 2px; }
-        .date-field input { width: 100%; padding: 8px 6px; border: 1.5px solid #2e7d32; border-radius: 6px; font-size: 12px; font-family: inherit; background: #fff; text-align: center; font-weight: bold; cursor: pointer; }
-        .btn-calc { background: #6f42c1; color: white; border: none; padding: 8px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; font-size: 12px; margin-top: 4px; }
-        .cancel-banner { background: #ffebee; color: #c62828; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 10px; border: 1px solid #ffcdd2; font-size: 12px; }
-
-        /* Custom In-App Calendar Styles */
-        .calendar-box { background: #ffffff; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid #2e7d32; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #2e7d32; }
-        .cal-nav-btn { background: #2e7d32; color: white; border: none; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-weight: bold; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; font-size: 11px; }
-        .cal-day-head { font-weight: bold; color: #666; padding: 3px 0; }
-        .cal-day { background: #f0f0f0; padding: 7px 0; border-radius: 4px; cursor: pointer; font-weight: bold; color: #333; }
-        .cal-day:active, .cal-day.selected { background: #2e7d32; color: white; }
-        .cal-day.empty { background: transparent; cursor: default; }
-
-        /* Collapsible Date Folder Styles */
-        .date-folder-btn { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #2e7d32; padding: 10px; width: 100%; text-align: left; font-weight: bold; font-size: 13px; border-radius: 8px; cursor: pointer; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .date-folder-content { display: none; padding: 8px 0; border-left: 2px dashed #2e7d32; margin-left: 6px; padding-left: 8px; }
+        .developer-footer { text-align: center; margin-top: 6px; font-size: 10px; color: #64748b; font-weight: 600; border-top: 1px dashed #cbd5e1; padding-top: 4px; flex-shrink: 0; }
+        .developer-footer span { color: #0f172a; font-weight: 800; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="brand-header-box">
-        <h1>FUCHKA CAFE</h1>
-        <div class="tagline">• POS SYSTEM •</div>
-        <div class="sync-status" id="syncStatus">🔄 Connecting Database...</div>
-    </div>
-
-    <div class="menu-scroll-area">
-        <div class="category-header">FUCHKA</div>
-        <div class="grid">
-            <button class="item-btn" onclick="add('Pani puri (6pcs)', 50)">Pani puri (6pcs) <br><span class="price-tag">₹50</span></button>
-            <button class="item-btn" onclick="add('Sweet puri (7pcs)', 70)">Sweet puri (7pcs) <br><span class="price-tag">₹70</span></button>
-            <button class="item-btn" onclick="add('Sev puri (6pcs)', 70)">Sev puri (6pcs) <br><span class="price-tag">₹70</span></button>
-            <button class="item-btn" onclick="add('Dahi puri (6pcs)', 80)">Dahi puri (6pcs) <br><span class="price-tag">₹80</span></button>
-            <button class="item-btn" onclick="add('Churmur', 70)">Churmur <br><span class="price-tag">₹70</span></button>
-            <button class="item-btn" onclick="add('Alu kabli', 60)">Alu kabli <br><span class="price-tag">₹60</span></button>
-            <button class="item-btn" onclick="add('Bhel puri', 70)">Bhel puri <br><span class="price-tag">₹70</span></button>
-            <button class="item-btn" onclick="add('Jhal muri', 60)">Jhal muri <br><span class="price-tag">₹60</span></button>
-            <button class="item-btn" onclick="add('Dahi papri', 80)">Dahi papri <br><span class="price-tag">₹80</span></button>
-        </div>
-
-        <div class="category-header">SANDWICH</div>
-        <div class="grid">
-            <button class="item-btn" onclick="add('Veg sandwich', 70)">Veg sandwich <br><span class="price-tag">₹70</span></button>
-            <button class="item-btn" onclick="add('Paneer tandoori sandwich', 90)">Paneer tandoori <br><span class="price-tag">₹90</span></button>
-            <button class="item-btn" onclick="add('Cheese sandwich', 100)">Cheese sandwich <br><span class="price-tag">₹100</span></button>
-        </div>
-
-        <div class="category-header">MOMO</div>
-        <div class="grid">
-            <button class="item-btn" onclick="add('Chicken momo (5pcs)', 100)">Chicken momo (5pcs) <br><span class="price-tag">₹100</span></button>
-            <button class="item-btn" onclick="add('Veg momo (6pcs)', 100)">Veg momo (6pcs) <br><span class="price-tag">₹100</span></button>
-            <button class="item-btn" onclick="add('Fried chicken momo (5pcs)', 110)">Fried chicken momo (5pcs) <br><span class="price-tag">₹110</span></button>
-            <button class="item-btn" onclick="add('Fried veg momo (6pcs)', 110)">Fried veg momo (6pcs) <br><span class="price-tag">₹110</span></button>
-        </div>
-
-        <div class="category-header">FRIES ITEM</div>
-        <div class="grid">
-            <button class="item-btn" onclick="add('Fish Finger (2pcs)', 100)">Fish Finger (2pcs) <br><span class="price-tag">₹100</span></button>
-            <button class="item-btn" onclick="add('Fish Cutlet (1pc)', 130)">Fish Cutlet (1pc) <br><span class="price-tag">₹130</span></button>
-            <button class="item-btn" style="grid-column: span 2;" onclick="add('Combo (1pc fish finger + 1pc fish cutlet)', 200)">Combo (1pc fish finger + 1pc fish cutlet) <br><span class="price-tag">₹200</span></button>
-        </div>
-
-        <div class="category-header">MAGGI</div>
-        <div class="grid">
-            <button class="item-btn" onclick="add('Masala maggi', 70)">Masala maggi <br><span class="price-tag">₹70</span></button>
-            <button class="item-btn" onclick="add('Vegetable maggi', 90)">Vegetable maggi <br><span class="price-tag">₹90</span></button>
-            <button class="item-btn" onclick="add('Schezwan maggi', 80)">Schezwan maggi <br><span class="price-tag">₹80</span></button>
-        </div>
-
-        <div class="category-header">EXTRA FUCHKA</div>
-        <div class="grid">
-            <button class="item-btn" onclick="add('Extra', 10)">Extra <br><span class="price-tag">₹10</span></button>
-            <button class="item-btn" onclick="add('Cha (Regular)', 20)">Cha Regular <br><span class="price-tag">₹20</span></button>
-        </div>
-    </div>
-
-    <div class="bottom-fixed-area">
-        <div id="receipt">
-            <b>Current Order:</b><br>
-            <div id="items" style="margin-top: 3px;"></div>
-        </div>
-        <div class="total">Total Bill: ₹<span id="totalPrice">0</span></div>
-
-        <div class="action-grid">
-            <button class="action-btn save-btn" onclick="saveOrder()">Save Bill</button>
-            <button class="action-btn hold-btn" onclick="holdOrder()">Hold Bill</button>
-            <button class="action-btn view-hold-btn" onclick="showHoldList()">Hold List (<span id="holdCount">0</span>)</button>
-            <button class="action-btn history-btn" onclick="showHistory()">Bill History</button>
-            <button class="action-btn cancel-list-btn" onclick="showCancelledHistory()">Cancel History (<span id="cancelCount">0</span>)</button>
-            <button class="action-btn reset-btn" onclick="resetOrder()">New Order</button>
-            <button class="action-btn settle-btn" onclick="openSettlementModal()">Settle Sale</button>
-            <button class="action-btn settle-history-btn" onclick="showSettlementHistory()">📜 Settle History</button>
-            <button class="action-btn total-sale-btn" onclick="openTotalSaleModal()">📊 Total Sale Analytics</button>
-        </div>
-
-        <div class="developer-footer">
-            Designed & Developed by <span>Pritam Das</span>
-        </div>
-    </div>
-</div>
-
-<div id="modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modalTitle">List</h3>
-            <span class="close-icon" onclick="closeModal()">✖</span>
-        </div>
-        <div id="modalFilterContainer"></div>
-        <div id="modalList"></div>
-        <button class="close-btn" onclick="closeModal()">Close</button>
-    </div>
-</div>
-
-<div id="calendarModal" class="modal-overlay" style="z-index: 4000;">
-    <div class="modal-content" style="max-width: 320px;">
-        <div class="calendar-box">
-            <div class="cal-header">
-                <button class="cal-nav-btn" onclick="changeCalMonth(-1)">❮</button>
-                <span id="calMonthYearTitle"></span>
-                <button class="cal-nav-btn" onclick="changeCalMonth(1)">❯</button>
-            </div>
-            <div class="cal-grid" id="calDaysGrid"></div>
-        </div>
-        <button class="close-btn" onclick="closeCalendarModal()">Cancel</button>
-    </div>
-</div>
-
-<div id="alertModal" class="modal-overlay">
-    <div class="alert-box">
-        <p id="alertMessage">Notification Message</p>
-        <button class="alert-ok-btn" onclick="closeAlert()">OK</button>
-    </div>
-</div>
-
-<div id="passwordModal" class="modal-overlay" style="z-index: 3000;">
-    <div class="alert-box">
-        <p style="margin-top:0; font-weight:bold; color:#d32f2f;">Cancel Order Verification</p>
-        <input type="password" id="adminPassInput" class="pass-input" placeholder="Enter Password">
-        <input type="text" id="adminReasonInput" class="pass-input" placeholder="Reason for cancellation">
-        <div style="margin-top:5px;">
-            <button class="alert-ok-btn" onclick="verifyPasswordForCancel()">Confirm Cancel</button>
-            <button class="alert-cancel-btn" onclick="closePasswordModal()">Back</button>
-        </div>
-    </div>
-</div>
-
-<div id="settlementModal" class="modal-overlay">
-    <div class="alert-box">
-        <h3 style="margin-top:0; color:#b71c1c;">Daily Sale Settlement</h3>
-        <div id="settlementDetails" style="text-align:left; font-size:12px; margin: 8px 0; background:#f5f5f5; padding:6px; border-radius:5px;"></div>
-        <p style="font-size:12px; color:#555;">Settle current sale session?</p>
         <div>
-            <button class="alert-ok-btn" onclick="confirmSettlement()">Confirm Settle</button>
-            <button class="alert-cancel-btn" onclick="closeSettlementModal()">Cancel</button>
+            <h1>Fuchka Cafe POS</h1>
+            <div class="tagline">Billing Terminal</div>
         </div>
+    </div>
+
+    <!-- Dynamic Menu Loaded From Firebase -->
+    <div id="dynamicMenuContainer" class="menu-scroll-area">
+        <p style="text-align:center; font-size:11px; color:#64748b; margin-top: 20px;">Loading Menu...</p>
+    </div>
+
+    <div class="developer-footer">
+        Designed & Developed by <span>Pritam Das</span>
     </div>
 </div>
 
@@ -247,540 +63,48 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let total = 0;
-    let currentItems = [];
-    const ADMIN_PASSWORD = "admin@123";
-    let selectedOrderForDelete = null;
-    
-    let orders = [];
-    let archivedOrders = {};
-    let heldOrders = [];
-    let cancelledOrders = [];
-    let settlementHistory = [];
-    let lastSettledTime = 0;
-
-    let activeCalTargetInputId = '';
-    let calCurrentYear = new Date().getFullYear();
-    let calCurrentMonth = new Date().getMonth();
-
-    db.ref('.info/connected').on('value', (snap) => {
-        if (snap.val() === true) {
-            document.getElementById('syncStatus').innerText = "⚡ Live Cloud Connected";
-            document.getElementById('syncStatus').style.color = "#a5d6a7";
-        } else {
-            document.getElementById('syncStatus').innerText = "❌ Connection Offline";
-            document.getElementById('syncStatus').style.color = "#ff8a80";
-        }
-    });
-
-    db.ref('cafeOrders').on('value', (snapshot) => {
+    // Real-time listener to load menu categories and items saved from the Admin Panel
+    db.ref('cafeMenuItems').on('value', (snapshot) => {
         let val = snapshot.val();
-        orders = val ? Object.values(val).filter(item => item && typeof item === 'object') : [];
-    });
-
-    db.ref('cafeArchivedHistory').on('value', (snapshot) => {
-        archivedOrders = snapshot.val() || {};
-    });
-
-    db.ref('cafeHeldOrders').on('value', (snapshot) => {
-        let val = snapshot.val();
-        heldOrders = val ? Object.values(val).filter(item => item && typeof item === 'object') : [];
-        updateHoldCount();
-    });
-
-    db.ref('cafeCancelledOrders').on('value', (snapshot) => {
-        let val = snapshot.val();
-        cancelledOrders = val ? Object.values(val).filter(item => item && typeof item === 'object') : [];
-        updateCancelCount();
-    });
-
-    db.ref('cafeSettlements').on('value', (snapshot) => {
-        let val = snapshot.val();
-        settlementHistory = val ? Object.values(val).filter(item => item && typeof item === 'object') : [];
-    });
-
-    db.ref('cafeLastSettled').on('value', (snapshot) => {
-        lastSettledTime = snapshot.val() || 0;
-    });
-
-    function getTodayString() {
-        let now = new Date();
-        if (now.getHours() < 5) {
-            now.setDate(now.getDate() - 1);
-        }
-        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    }
-
-    function add(name, price) {
-        let existingItem = currentItems.find(item => item.name === name);
-        if (existingItem) { existingItem.qty += 1; } 
-        else { currentItems.push({ name: name, price: price, qty: 1 }); }
-        updateCart();
-    }
-
-    function increaseQty(index) { currentItems[index].qty += 1; updateCart(); }
-    function decreaseQty(index) {
-        if (currentItems[index].qty > 1) { currentItems[index].qty -= 1; } 
-        else { currentItems.splice(index, 1); }
-        updateCart();
-    }
-
-    function calculateTotal() {
-        total = currentItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
-    }
-
-    function updateCart() {
-        calculateTotal();
-        renderCurrentReceipt();
-    }
-
-    function renderCurrentReceipt() {
-        let itemsHTML = '';
-        currentItems.forEach((item, index) => {
-            let itemTotal = (item.price || 0) * item.qty;
-            itemsHTML += `
-                <div class="receipt-item">
-                    <span>• ${item.name}</span>
-                    <div class="qty-controls">
-                        <button class="qty-btn minus" onclick="decreaseQty(${index})">-</button>
-                        <span class="qty-num">${item.qty}</span>
-                        <button class="qty-btn" onclick="increaseQty(${index})">+</button>
-                    </div>
-                    <span class="item-price">₹${itemTotal}</span>
-                </div>`;
-        });
-        document.getElementById('items').innerHTML = itemsHTML;
-        document.getElementById('totalPrice').innerText = total;
-    }
-
-    function saveOrder() {
-        if (total === 0) return customAlert('No item selected!');
-        let now = new Date();
-        let id = Date.now();
-        let orderDetails = {
-            id: id,
-            timestamp: id,
-            date: getTodayString(),
-            time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            items: JSON.parse(JSON.stringify(currentItems)),
-            total: total
-        };
-
-        db.ref('cafeOrders/' + id).set(orderDetails)
-            .then(() => {
-                customAlert('Bill Saved & Synced Live!');
-                resetOrder();
-            })
-            .catch((err) => customAlert('Save Error: ' + err.message));
-    }
-
-    function holdOrder() {
-        if (total === 0) return customAlert('No item to hold!');
-        let id = Date.now();
-        let holdDetails = {
-            id: id,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            items: JSON.parse(JSON.stringify(currentItems)),
-            total: total
-        };
-
-        db.ref('cafeHeldOrders/' + id).set(holdDetails);
-        customAlert('Order placed on hold!');
-        resetOrder();
-    }
-
-    function restoreOrder(index) {
-        let ord = heldOrders[index];
-        currentItems = JSON.parse(JSON.stringify(ord.items));
-        updateCart();
-        db.ref('cafeHeldOrders/' + ord.id).remove();
-        closeModal();
-    }
-
-    function deleteHoldOrder(index) {
-        let ord = heldOrders[index];
-        db.ref('cafeHeldOrders/' + ord.id).remove();
-        showHoldList();
-    }
-
-    function openPasswordModal(id) { 
-        selectedOrderForDelete = id; 
-        document.getElementById('adminPassInput').value = ''; 
-        document.getElementById('adminReasonInput').value = '';
-        document.getElementById('passwordModal').style.display = 'flex'; 
-    }
-
-    function verifyPasswordForCancel() {
-        let inputPass = document.getElementById('adminPassInput').value;
-        let inputReason = document.getElementById('adminReasonInput').value.trim();
-
-        if (inputPass !== ADMIN_PASSWORD) {
-            customAlert("❌ Incorrect Password! Access Denied.");
+        let container = document.getElementById('dynamicMenuContainer');
+        if (!val) {
+            container.innerHTML = '<p style="text-align:center; color:#64748b; font-size:11px;">No menu items found. Please add items from the Admin Panel.</p>';
             return;
         }
 
-        if (inputReason === "") {
-            customAlert("⚠️ Please enter a cancellation reason.");
-            return;
-        }
-
-        closePasswordModal();
-        executeCancelOrder(inputReason);
-    }
-
-    function executeCancelOrder(reason) {
-        let canceledItem = orders.find(ord => ord.id === selectedOrderForDelete);
-        if (canceledItem) {
-            canceledItem.cancelledAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            canceledItem.cancelReason = reason;
-            
-            db.ref('cafeCancelledOrders/' + canceledItem.id).set(canceledItem);
-            db.ref('cafeOrders/' + selectedOrderForDelete).remove();
-            customAlert("Bill Cancelled Successfully!");
-        }
-        selectedOrderForDelete = null;
-        showHistory();
-    }
-
-    function confirmSettlement() {
-        let activeOrders = orders.filter(ord => (ord.timestamp || 0) > lastSettledTime);
-        let sessionTotal = activeOrders.reduce((acc, curr) => acc + curr.total, 0);
-        let now = new Date();
-        let id = Date.now();
-        let todayDate = getTodayString();
-
-        let settlementData = {
-            id: id,
-            date: todayDate,
-            time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            totalBills: activeOrders.length,
-            totalAmount: sessionTotal,
-            timestamp: id
-        };
-
-        // Transfer active orders to Archived History by Date
-        activeOrders.forEach(ord => {
-            db.ref(`cafeArchivedHistory/${ord.date}/${ord.id}`).set(ord);
-            db.ref('cafeOrders/' + ord.id).remove();
-        });
-
-        lastSettledTime = id;
-        db.ref('cafeLastSettled').set(lastSettledTime);
-        db.ref('cafeSettlements/' + id).set(settlementData);
-
-        closeSettlementModal();
-        customAlert("Sale Settled Live & Recorded! Active sale reset to ₹0.");
-    }
-
-    function updateHoldCount() { document.getElementById('holdCount').innerText = heldOrders.length; }
-    function updateCancelCount() { document.getElementById('cancelCount').innerText = cancelledOrders.length; }
-
-    function resetOrder() {
-        total = 0;
-        currentItems = [];
-        document.getElementById('items').innerHTML = '';
-        document.getElementById('totalPrice').innerText = '0';
-    }
-
-    function customAlert(msg) { document.getElementById('alertMessage').innerText = msg; document.getElementById('alertModal').style.display = 'flex'; }
-    function closeAlert() { document.getElementById('alertModal').style.display = 'none'; }
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; }
-
-    // Unified Date-wise Folder Bill History View
-    function showHistory() {
-        document.getElementById('modalTitle').innerText = 'Bill History (By Date)';
-        let listDiv = document.getElementById('modalList');
-        document.getElementById('modalFilterContainer').innerHTML = '';
+        // Convert firebase object to array of items
+        let itemsArray = Object.values(val);
         
-        let groupedByDate = {};
-
-        // 1. Map Active Orders by Date
-        orders.forEach(ord => {
-            let d = ord.date || getTodayString();
-            if (!groupedByDate[d]) groupedByDate[d] = [];
-            groupedByDate[d].push(ord);
-        });
-
-        // 2. Map Archived Orders by Date
-        Object.keys(archivedOrders).forEach(d => {
-            if (!groupedByDate[d]) groupedByDate[d] = [];
-            let archivedList = Object.values(archivedOrders[d] || {});
-            archivedList.forEach(ord => {
-                // Prevent duplicates if already present
-                if (!groupedByDate[d].some(existing => existing.id === ord.id)) {
-                    groupedByDate[d].push(ord);
-                }
-            });
-        });
-
-        let sortedDates = Object.keys(groupedByDate).sort().reverse();
-
-        if (sortedDates.length === 0) {
-            listDiv.innerHTML = '<p style="text-align:center; font-size:12px; color:#777;">No bills recorded yet.</p>';
-            document.getElementById('modal').style.display = 'flex';
-            return;
-        }
-
-        let html = '';
-        sortedDates.forEach((dateStr, idx) => {
-            let dayBills = groupedByDate[dateStr];
-            let dayTotal = dayBills.reduce((sum, b) => sum + (b.total || 0), 0);
-
-            html += `
-                <button class="date-folder-btn" onclick="toggleFolder('folder-${idx}')">
-                    <span>📅 ${dateStr} (${dayBills.length} Bills)</span>
-                    <span>₹${dayTotal} ▾</span>
-                </button>
-                <div id="folder-${idx}" class="date-folder-content">`;
-            
-            // Show latest bills on top inside the folder
-            [...dayBills].reverse().forEach((ord) => {
-                let itemsList = (ord.items || []).map(i => `<li><span>• ${i.name} x${i.qty}</span> <span>₹${i.price * i.qty}</span></li>`).join('');
-                let isUnsettled = (ord.timestamp || 0) > lastSettledTime;
-                
-                html += `
-                    <div class="bill-item" style="background:#fff;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <b>Time: ${ord.time}</b>
-                            ${isUnsettled ? '<span style="color:#d32f2f; font-size:10px; font-weight:bold; background:#ffebee; padding:2px 5px; border-radius:4px;">Unsettled</span>' : '<span style="color:#2e7d32; font-size:10px; font-weight:bold; background:#e8f5e9; padding:2px 5px; border-radius:4px;">Settled</span>'}
-                        </div>
-                        <ul class="history-item-list">${itemsList}</ul>
-                        <div style="color:#2e7d32; font-weight:bold; text-align:right;">Total: ₹${ord.total}</div>
-                        ${isUnsettled ? `<button class="delete-btn" style="width:100%; margin-top:6px;" onclick="openPasswordModal(${ord.id})">Cancel Bill</button>` : ''}
-                    </div>`;
-            });
-
-            html += `</div>`;
-        });
-
-        listDiv.innerHTML = html;
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    function toggleFolder(id) {
-        let el = document.getElementById(id);
-        if (el.style.display === "block") {
-            el.style.display = "none";
-        } else {
-            el.style.display = "block";
-        }
-    }
-
-    function openTotalSaleModal() {
-        let todayStr = getTodayString();
-        document.getElementById('modalTitle').innerText = 'Sale Analytics';
-
-        let currentSessionOrders = orders.filter(ord => (ord.timestamp || 0) > lastSettledTime);
-        let activeSessionTotal = currentSessionOrders.reduce((acc, curr) => acc + curr.total, 0);
-        
-        let containerHtml = `
-            <div class="analytics-card" style="background:#fff3e0; border-color:#ffe0b2;">
-                <div class="analytics-title" style="color:#e65100;">Active Sale (Unsettled)</div>
-                <div class="analytics-amount" style="color:#d32f2f;">₹${activeSessionTotal}</div>
-                <small style="color:#666;">Active Bills Count: <b>${currentSessionOrders.length}</b></small>
-            </div>
-
-            <div class="analytics-card">
-                <div class="analytics-title">Custom Date Range Sale</div>
-                <div class="date-picker-grid">
-                    <div class="date-field">
-                        <label>From Date:</label>
-                        <input type="text" id="startDate" value="${todayStr}" readonly onclick="openCustomCalendar('startDate')">
-                    </div>
-                    <div class="date-field">
-                        <label>To Date:</label>
-                        <input type="text" id="endDate" value="${todayStr}" readonly onclick="openCustomCalendar('endDate')">
-                    </div>
-                </div>
-                <button class="btn-calc" onclick="calculateCustomSale()">Show Selected Sale</button>
-            </div>
-            
-            <div id="customResultArea"></div>`;
-        
-        document.getElementById('modalFilterContainer').innerHTML = containerHtml;
-        document.getElementById('modalList').innerHTML = '';
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    function openCustomCalendar(inputId) {
-        activeCalTargetInputId = inputId;
-        let currentVal = document.getElementById(inputId).value;
-        if(currentVal) {
-            let parts = currentVal.split('-');
-            calCurrentYear = parseInt(parts[0]);
-            calCurrentMonth = parseInt(parts[1]) - 1;
-        }
-        renderCalendarUI();
-        document.getElementById('calendarModal').style.display = 'flex';
-    }
-
-    function closeCalendarModal() {
-        document.getElementById('calendarModal').style.display = 'none';
-    }
-
-    function changeCalMonth(step) {
-        calCurrentMonth += step;
-        if (calCurrentMonth < 0) {
-            calCurrentMonth = 11;
-            calCurrentYear -= 1;
-        } else if (calCurrentMonth > 11) {
-            calCurrentMonth = 0;
-            calCurrentYear += 1;
-        }
-        renderCalendarUI();
-    }
-
-    function renderCalendarUI() {
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        document.getElementById('calMonthYearTitle').innerText = `${months[calCurrentMonth]} ${calCurrentYear}`;
-
-        let gridHtml = `
-            <div class="cal-day-head">Su</div>
-            <div class="cal-day-head">Mo</div>
-            <div class="cal-day-head">Tu</div>
-            <div class="cal-day-head">We</div>
-            <div class="cal-day-head">Th</div>
-            <div class="cal-day-head">Fr</div>
-            <div class="cal-day-head">Sa</div>`;
-
-        let firstDay = new Date(calCurrentYear, calCurrentMonth, 1).getDay();
-        let totalDays = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
-
-        for (let i = 0; i < firstDay; i++) {
-            gridHtml += `<div class="cal-day empty"></div>`;
-        }
-
-        let selectedVal = document.getElementById(activeCalTargetInputId) ? document.getElementById(activeCalTargetInputId).value : '';
-
-        for (let d = 1; d <= totalDays; d++) {
-            let monthStr = String(calCurrentMonth + 1).padStart(2, '0');
-            let dayStr = String(d).padStart(2, '0');
-            let fullDateStr = `${calCurrentYear}-${monthStr}-${dayStr}`;
-
-            let isSelected = selectedVal === fullDateStr ? 'selected' : '';
-            gridHtml += `<div class="cal-day ${isSelected}" onclick="selectCalDate('${fullDateStr}')">${d}</div>`;
-        }
-
-        document.getElementById('calDaysGrid').innerHTML = gridHtml;
-    }
-
-    function selectCalDate(dateStr) {
-        if(activeCalTargetInputId) {
-            document.getElementById(activeCalTargetInputId).value = dateStr;
-        }
-        closeCalendarModal();
-    }
-
-    function calculateCustomSale() {
-        let startVal = document.getElementById('startDate').value.trim();
-        let endVal = document.getElementById('endDate').value.trim();
-
-        if (!startVal || !endVal) {
-            customAlert("Please enter both dates!");
-            return;
-        }
-
-        let allBills = [...orders];
-        Object.keys(archivedOrders).forEach(d => {
-            if (archivedOrders[d]) {
-                let list = Object.values(archivedOrders[d]);
-                list.forEach(item => {
-                    if (!allBills.some(b => b.id === item.id)) {
-                        allBills.push(item);
-                    }
-                });
+        // Group items by category (cat) automatically
+        let grouped = {};
+        itemsArray.forEach(item => {
+            if (item && item.name && item.price) {
+                let cat = (item.cat || 'OTHER').toUpperCase();
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(item);
             }
         });
 
-        let filtered = allBills.filter(ord => ord.date >= startVal && ord.date <= endVal);
-        let grandTotal = filtered.reduce((acc, curr) => acc + curr.total, 0);
-
-        let resultHtml = `
-            <div class="analytics-card" style="background:#e8f5e9; border-color:#c8e6c9;">
-                <div class="analytics-title" style="color:#2e7d32;">Custom Range Total</div>
-                <div class="analytics-amount">₹${grandTotal}</div>
-                <small style="color:#555;">Range: <b>${startVal}</b> to <b>${endVal}</b></small><br>
-                <small style="color:#555;">Total Bills: <b>${filtered.length}</b></small>
-            </div>`;
-
-        document.getElementById('customResultArea').innerHTML = resultHtml;
-    }
-
-    function showHoldList() {
-        document.getElementById('modalTitle').innerText = 'Held Orders';
-        let listDiv = document.getElementById('modalList');
-        document.getElementById('modalFilterContainer').innerHTML = '';
-        if (heldOrders.length === 0) { listDiv.innerHTML = '<p style="text-align:center;">No held orders.</p>'; } 
-        else {
-            let html = '';
-            heldOrders.forEach((ord, index) => {
-                html += `<div class="bill-item"><b>Hold Bill #${index + 1} (${ord.time})</b><div style="color:#d32f2f; font-weight:bold;">Total: ₹${ord.total}</div><div class="btn-group"><button class="restore-btn" onclick="restoreOrder(${index})">Restore</button><button class="delete-btn" onclick="deleteHoldOrder(${index})">Delete</button></div></div>`;
+        let html = '';
+        Object.keys(grouped).forEach(category => {
+            html += `<div class="category-header">📁 ${category}</div><div class="grid">`;
+            grouped[category].forEach(item => {
+                let safeName = item.name.replace(/'/g, "\\'");
+                html += `<button class="item-btn" onclick="addItemToCart('${safeName}', ${item.price})">
+                    <span>${item.name}</span>
+                    <span class="price-tag">₹${item.price}</span>
+                </button>`;
             });
-            listDiv.innerHTML = html;
-        }
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    function showCancelledHistory() {
-        document.getElementById('modalTitle').innerText = 'Cancelled Bills';
-        let listDiv = document.getElementById('modalList');
+            html += `</div>`;
+        });
         
-        let bannerHtml = `
-            <div class="cancel-banner">
-                Total Cancelled Orders: <b>${cancelledOrders.length}</b>
-            </div>`;
-            
-        document.getElementById('modalFilterContainer').innerHTML = bannerHtml;
+        container.innerHTML = html;
+    });
 
-        if (cancelledOrders.length === 0) { 
-            listDiv.innerHTML = '<p style="text-align:center; font-size:12px; color:#777;">No cancelled bills found.</p>'; 
-        } else {
-            let html = '';
-            [...cancelledOrders].reverse().forEach((ord) => {
-                html += `
-                    <div class="bill-item" style="border-left: 4px solid #dc3545;">
-                        <b style="color:#dc3545;">Cancelled</b> - ${ord.date} (${ord.time})<br>
-                        <b>Total: ₹${ord.total}</b><br>
-                        <small style="color:#d32f2f;"><b>Reason:</b> ${ord.cancelReason || 'N/A'}</small>
-                    </div>`;
-            });
-            listDiv.innerHTML = html;
-        }
-        document.getElementById('modal').style.display = 'flex';
+    // Dummy function to prevent error when clicking items (you can attach your cart logic here)
+    function addItemToCart(name, price) {
+        console.log("Added to cart:", name, price);
     }
-
-    function showSettlementHistory() {
-        document.getElementById('modalTitle').innerText = 'Settlement Ledger History';
-        let listDiv = document.getElementById('modalList');
-        document.getElementById('modalFilterContainer').innerHTML = '';
-
-        if (settlementHistory.length === 0) {
-            listDiv.innerHTML = '<p style="text-align:center; font-size:12px; color:#777;">No settlement records found.</p>';
-        } else {
-            let html = '';
-            [...settlementHistory].reverse().forEach((st) => {
-                html += `
-                    <div class="bill-item" style="border-left: 4px solid #b71c1c; background: #fff5f5;">
-                        <b style="color:#b71c1c;">Settled Date: ${st.date} (${st.time})</b><br>
-                        <span>Total Bills Settled: <b>${st.totalBills}</b></span>
-                        <div style="color:#2e7d32; font-weight:bold; font-size:14px; margin-top:2px;">
-                            Settled Amount: ₹${st.totalAmount}
-                        </div>
-                    </div>`;
-            });
-            listDiv.innerHTML = html;
-        }
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    function openSettlementModal() {
-        let activeOrders = orders.filter(ord => (ord.timestamp || 0) > lastSettledTime);
-        let sessionTotal = activeOrders.reduce((acc, curr) => acc + curr.total, 0);
-        document.getElementById('settlementDetails').innerHTML = `<b>Current Session Bills:</b> ${activeOrders.length}<br><b>Current Session Sale:</b> ₹${sessionTotal}`;
-        document.getElementById('settlementModal').style.display = 'flex';
-    }
-    function closeSettlementModal() { document.getElementById('settlementModal').style.display = 'none'; }
 </script>
 </body>
 </html>
