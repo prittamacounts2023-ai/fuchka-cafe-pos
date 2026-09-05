@@ -10,39 +10,40 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 10px; background: #dce4ec; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .app-container { width: 100%; max-width: 420px; height: 98vh; max-height: 870px; background: white; padding: 14px; border-radius: 16px; border: 3px solid #2e7d32; box-shadow: 0 8px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; position: relative; }
-        .brand-header-box { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #004d40 100%); border: 2px solid #ffd700; border-radius: 12px; padding: 12px 10px; margin-bottom: 10px; text-align: center; box-shadow: 0 4px 12px rgba(27, 94, 32, 0.3); flex-shrink: 0; }
-        .brand-header-box h1 { color: #ffffff; margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 0; background: #dce4ec; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; height: 100vh; overflow: hidden; }
+        .app-container { width: 100%; max-width: 480px; height: 100%; max-height: 100vh; background: white; padding: 10px; display: flex; flex-direction: column; position: relative; }
+        .brand-header-box { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #004d40 100%); border-bottom: 2px solid #ffd700; padding: 10px; margin-bottom: 8px; text-align: center; flex-shrink: 0; }
+        .brand-header-box h1 { color: #ffffff; margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; }
         
-        /* Professional Status Badge & Developer Tag */
-        .status-badge-container { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 6px; }
-        .sync-status { font-size: 10.5px; padding: 2px 8px; border-radius: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .status-badge-container { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 4px; }
+        .sync-status { font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; display: inline-flex; align-items: center; gap: 4px; }
         .status-online { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
         .status-offline { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
-        .pending-badge { font-size: 10px; background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; padding: 2px 6px; border-radius: 12px; font-weight: bold; display: none; }
+        .pending-badge { font-size: 10px; background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; padding: 2px 6px; border-radius: 10px; font-weight: bold; display: none; }
         
-        .header-developer-tag { margin-top: 5px; font-size: 9.5px; color: #e0f2f1; font-weight: 600; letter-spacing: 0.5px; border-top: 1px dashed rgba(255,255,255,0.3); padding-top: 4px; }
+        .header-developer-tag { margin-top: 4px; font-size: 9px; color: #e0f2f1; font-weight: 600; letter-spacing: 0.5px; border-top: 1px dashed rgba(255,255,255,0.3); padding-top: 3px; }
         .header-developer-tag span { color: #ffd700; font-weight: 800; }
 
-        .menu-scroll-area { flex: 1; overflow-y: auto; padding-right: 4px; margin-bottom: 6px; }
-        .category-header { border-bottom: 2px solid #2e7d32; padding-bottom: 3px; color: #2e7d32; margin-top: 10px; margin-bottom: 8px; font-size: 14px; font-weight: 800; text-transform: uppercase; }
+        .menu-scroll-area { flex: 1; overflow-y: auto; padding-right: 2px; margin-bottom: 6px; -webkit-overflow-scrolling: touch; }
+        .category-header { border-bottom: 2px solid #2e7d32; padding-bottom: 2px; color: #2e7d32; margin-top: 8px; margin-bottom: 6px; font-size: 13px; font-weight: 800; text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .item-btn { background: #ffffff; color: #333; border: 1.5px solid #2e7d32; padding: 8px 4px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; text-align: center; }
+        .item-btn { background: #ffffff; color: #333; border: 1.5px solid #2e7d32; padding: 10px 6px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; text-align: center; min-height: 48px; }
         .item-btn:active { background: #2e7d32; color: white; transform: scale(0.98); }
         .price-tag { color: #d32f2f; font-weight: bold; }
+        
         .bottom-fixed-area { flex-shrink: 0; border-top: 1px solid #ccc; padding-top: 6px; background: #fff; }
-        #receipt { background: #f9f9f9; padding: 8px; border-radius: 8px; border: 1px solid #ccc; height: 95px; overflow-y: auto; font-size: 12px; }
+        #receipt { background: #f9f9f9; padding: 6px; border-radius: 6px; border: 1px solid #ccc; height: 85px; overflow-y: auto; font-size: 12px; }
         .receipt-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dotted #ddd; padding-bottom: 3px; }
         .qty-controls { display: flex; align-items: center; gap: 6px; }
-        .qty-btn { background: #2e7d32; color: white; border: none; width: 22px; height: 22px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .qty-btn { background: #2e7d32; color: white; border: none; width: 24px; height: 24px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
         .qty-btn.minus { background: #ff9800; }
         .qty-num { font-weight: bold; font-size: 12px; color: #d32f2f; }
         .item-price { font-weight: bold; width: 45px; text-align: right; }
-        .total { font-size: 15px; font-weight: bold; color: #d32f2f; margin-top: 4px; text-align: right; border-top: 2px solid #2e7d32; padding-top: 2px; }
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 6px; }
-        .action-btn { color: white; border: none; padding: 7px 4px; font-size: 11px; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; text-align: center; }
+        .total { font-size: 14px; font-weight: bold; color: #d32f2f; margin-top: 4px; text-align: right; border-top: 2px solid #2e7d32; padding-top: 2px; }
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 6px; }
+        .action-btn { color: white; border: none; padding: 8px 2px; font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; text-align: center; }
         .save-btn { background: #28a745; }
         .hold-btn { background: #ffc107; color: #333; }
         .view-hold-btn { background: #fd7e14; }
@@ -53,63 +54,58 @@
         .settle-history-btn { background: #007bff; }
         .total-sale-btn { background: #6f42c1; }
         .admin-btn { background: #343a40; }
-        .whatsapp-btn { background: #25D366; grid-column: span 2; }
+        .whatsapp-btn { background: #25D366; grid-column: span 3; font-size: 11px; padding: 10px; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; width: 92%; max-width: 380px; max-height: 82vh; padding: 15px; border-radius: 10px; overflow-y: auto; border: 2px solid #2e7d32; position: relative; z-index: 1001; }
+        .modal-content { background: white; width: 95%; max-width: 400px; max-height: 85vh; padding: 12px; border-radius: 8px; overflow-y: auto; border: 2px solid #2e7d32; position: relative; }
         
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 10px; }
-        .modal-header h3 { margin: 0; color: #2e7d32; font-size: 16px; }
-        .close-icon { font-size: 20px; font-weight: bold; color: #dc3545; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px; }
-        .close-icon:hover { background: #ffebee; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2e7d32; padding-bottom: 4px; margin-bottom: 8px; }
+        .modal-header h3 { margin: 0; color: #2e7d32; font-size: 15px; }
+        .close-icon { font-size: 18px; font-weight: bold; color: #dc3545; cursor: pointer; padding: 4px 8px; }
 
-        .close-btn { background: #6c757d; width: 100%; padding: 8px; margin-top: 10px; border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        .bill-item { border: 1px solid #e0e0e0; background: #fafafa; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 12px; }
+        .close-btn { background: #6c757d; width: 100%; padding: 8px; margin-top: 8px; border: none; color: white; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .bill-item { border: 1px solid #e0e0e0; background: #fafafa; border-radius: 6px; padding: 8px; margin-bottom: 6px; font-size: 11px; }
         .history-item-list { margin: 4px 0; padding-left: 0; list-style: none; }
         .history-item-list li { padding: 2px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; }
-        .btn-group { display: flex; gap: 6px; margin-top: 6px; }
-        .restore-btn { background: #28a745; color: white; border: none; padding: 5px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; flex: 1; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 5px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; flex: 1; }
+        .btn-group { display: flex; gap: 6px; margin-top: 4px; }
+        .restore-btn { background: #28a745; color: white; border: none; padding: 4px 6px; font-size: 10px; border-radius: 4px; cursor: pointer; flex: 1; }
+        .delete-btn { background: #dc3545; color: white; border: none; padding: 4px 6px; font-size: 10px; border-radius: 4px; cursor: pointer; flex: 1; }
         
-        .alert-box { background: white; padding: 16px; border-radius: 8px; text-align: center; max-width: 300px; width: 85%; border: 2px solid #2e7d32; position: relative; z-index: 5000; }
-        .alert-ok-btn { background: #2e7d32; color: white; border: none; padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; }
-        .alert-cancel-btn { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; margin-left: 5px; }
-        .pass-input { width: 90%; padding: 6px; font-size: 13px; margin-bottom: 8px; border-radius: 4px; border: 1px solid #ccc; text-align: center; }
+        .alert-box { background: white; padding: 14px; border-radius: 8px; text-align: center; max-width: 320px; width: 90%; border: 2px solid #2e7d32; }
+        .alert-ok-btn { background: #2e7d32; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .alert-cancel-btn { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-left: 5px; }
+        .pass-input { width: 100%; padding: 8px; font-size: 13px; margin-bottom: 8px; border-radius: 4px; border: 1px solid #ccc; text-align: center; }
 
-        /* Password Wrapper with Eye Button */
-        .password-input-wrapper { position: relative; display: inline-block; width: 90%; margin-bottom: 8px; }
-        .password-input-wrapper input { width: 100%; padding: 6px 30px 6px 6px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; text-align: center; }
-        .eye-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 14px; padding: 0; color: #555; }
+        .password-input-wrapper { position: relative; display: block; width: 100%; margin-bottom: 8px; }
+        .password-input-wrapper input { width: 100%; padding: 8px 35px 8px 8px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; text-align: center; }
+        .eye-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 12px; padding: 4px; color: #555; }
 
-        .analytics-card { background: #f0f4f8; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #d0dbe5; text-align: center; }
-        .analytics-title { font-size: 11px; color: #555; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        .analytics-amount { font-size: 24px; color: #2e7d32; font-weight: 800; margin: 4px 0; }
-        .date-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: left; margin: 8px 0; }
+        .analytics-card { background: #f0f4f8; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #d0dbe5; text-align: center; }
+        .analytics-title { font-size: 11px; color: #555; font-weight: bold; text-transform: uppercase; }
+        .analytics-amount { font-size: 20px; color: #2e7d32; font-weight: 800; margin: 4px 0; }
+        .date-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; text-align: left; margin: 6px 0; }
         .date-field label { font-size: 10px; font-weight: bold; color: #444; display: block; margin-bottom: 2px; }
-        .date-field input { width: 100%; padding: 8px 6px; border: 1.5px solid #2e7d32; border-radius: 6px; font-size: 12px; font-family: inherit; background: #fff; text-align: center; font-weight: bold; cursor: pointer; }
-        .btn-calc { background: #6f42c1; color: white; border: none; padding: 8px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; font-size: 12px; margin-top: 4px; }
-        .cancel-banner { background: #ffebee; color: #c62828; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 10px; border: 1px solid #ffcdd2; font-size: 12px; }
+        .date-field input { width: 100%; padding: 6px; border: 1.5px solid #2e7d32; border-radius: 4px; font-size: 11px; font-family: inherit; background: #fff; text-align: center; font-weight: bold; }
+        .btn-calc { background: #6f42c1; color: white; border: none; padding: 6px; border-radius: 4px; width: 100%; font-weight: bold; cursor: pointer; font-size: 11px; margin-top: 4px; }
+        .cancel-banner { background: #ffebee; color: #c62828; padding: 6px; border-radius: 4px; text-align: center; font-weight: bold; margin-bottom: 8px; border: 1px solid #ffcdd2; font-size: 11px; }
 
-        /* Custom In-App Calendar Styles */
-        .calendar-box { background: #ffffff; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid #2e7d32; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #2e7d32; }
-        .cal-nav-btn { background: #2e7d32; color: white; border: none; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-weight: bold; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; font-size: 11px; }
-        .cal-day-head { font-weight: bold; color: #666; padding: 3px 0; }
-        .cal-day { background: #f0f0f0; padding: 7px 0; border-radius: 4px; cursor: pointer; font-weight: bold; color: #333; }
+        .calendar-box { background: #ffffff; padding: 8px; border-radius: 6px; text-align: center; border: 2px solid #2e7d32; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; margin-bottom: 6px; font-size: 13px; color: #2e7d32; }
+        .cal-nav-btn { background: #2e7d32; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-weight: bold; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; font-size: 11px; }
+        .cal-day-head { font-weight: bold; color: #666; padding: 2px 0; }
+        .cal-day { background: #f0f0f0; padding: 6px 0; border-radius: 4px; cursor: pointer; font-weight: bold; color: #333; }
         .cal-day:active, .cal-day.selected { background: #2e7d32; color: white; }
         .cal-day.empty { background: transparent; cursor: default; }
 
-        /* Collapsible Date Folder Styles */
-        .date-folder-btn { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #2e7d32; padding: 10px; width: 100%; text-align: left; font-weight: bold; font-size: 13px; border-radius: 8px; cursor: pointer; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .date-folder-content { display: none; padding: 8px 0; border-left: 2px dashed #2e7d32; margin-left: 6px; padding-left: 8px; }
+        .date-folder-btn { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #2e7d32; padding: 8px; width: 100%; text-align: left; font-weight: bold; font-size: 12px; border-radius: 6px; cursor: pointer; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .date-folder-content { display: none; padding: 6px 0; border-left: 2px dashed #2e7d32; margin-left: 4px; padding-left: 6px; }
 
-        /* Admin Form Styles */
-        .admin-form-group { margin-bottom: 8px; text-align: left; }
-        .admin-form-group label { display: block; font-size: 11px; font-weight: bold; color: #333; margin-bottom: 2px; }
-        .admin-form-group input, .admin-form-group select { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+        .admin-form-group { margin-bottom: 6px; text-align: left; }
+        .admin-form-group label { display: block; font-size: 10px; font-weight: bold; color: #333; margin-bottom: 2px; }
+        .admin-form-group input, .admin-form-group select { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; }
         .admin-item-row { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 6px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 4px; font-size: 11px; }
-        .edit-btn { background: #ffc107; color: #333; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; margin-right: 4px; }
+        .edit-btn { background: #ffc107; color: #333; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; margin-right: 4px; }
     </style>
 </head>
 <body>
@@ -118,37 +114,35 @@
     <div class="brand-header-box">
         <h1>FUCHKA CAFE</h1>
         <div class="status-badge-container">
-            <div class="sync-status status-offline" id="syncStatus">🔴 Offline Mode</div>
-            <div class="pending-badge" id="pendingBadge">🔄 Sync Pending: <span id="pendingCount">0</span></div>
+            <div class="sync-status status-offline" id="syncStatus">Offline Mode</div>
+            <div class="pending-badge" id="pendingBadge">Sync Pending: <span id="pendingCount">0</span></div>
         </div>
         <div class="header-developer-tag">
             Designed & Developed by <span>Pritam Das</span>
         </div>
     </div>
 
-    <div class="menu-scroll-area" id="menuContainer">
-        <!-- Dynamic Menu Rendered Here -->
-    </div>
+    <div class="menu-scroll-area" id="menuContainer"></div>
 
     <div class="bottom-fixed-area">
         <div id="receipt">
             <b>Current Order:</b><br>
-            <div id="items" style="margin-top: 3px;"></div>
+            <div id="items" style="margin-top: 2px;"></div>
         </div>
         <div class="total">Total Bill: ₹<span id="totalPrice">0</span></div>
 
         <div class="action-grid">
             <button class="action-btn save-btn" onclick="saveOrder()">Save Bill</button>
-            <button class="action-btn hold-btn" onclick="holdOrder()">Hold Bill</button>
-            <button class="action-btn view-hold-btn" onclick="showHoldList()">Hold List (<span id="holdCount">0</span>)</button>
-            <button class="action-btn history-btn" onclick="showHistory()">Bill History</button>
-            <button class="action-btn cancel-list-btn" onclick="showCancelledHistory()">Cancel History (<span id="cancelCount">0</span>)</button>
+            <button class="action-btn hold-btn" onclick="holdOrder()">Hold</button>
+            <button class="action-btn view-hold-btn" onclick="showHoldList()">Hold (<span id="holdCount">0</span>)</button>
+            <button class="action-btn history-btn" onclick="showHistory()">History</button>
+            <button class="action-btn cancel-list-btn" onclick="showCancelledHistory()">Cancelled (<span id="cancelCount">0</span>)</button>
             <button class="action-btn reset-btn" onclick="resetOrder()">New Order</button>
-            <button class="action-btn settle-btn" onclick="openSettlementModal()">Settle Sale</button>
-            <button class="action-btn settle-history-btn" onclick="showSettlementHistory()">📜 Settle History</button>
-            <button class="action-btn total-sale-btn" onclick="openTotalSaleModal()">📊 Total Sale Analytics</button>
-            <button class="action-btn admin-btn" onclick="openAdminLoginModal()">⚙️ Admin Panel</button>
-            <button class="action-btn whatsapp-btn" onclick="openWhatsAppModal()">💬 Send Bill via WhatsApp</button>
+            <button class="action-btn settle-btn" onclick="openSettlementModal()">Settle</button>
+            <button class="action-btn settle-history-btn" onclick="showSettlementHistory()">Settle Log</button>
+            <button class="action-btn total-sale-btn" onclick="openTotalSaleModal()">Analytics</button>
+            <button class="action-btn admin-btn" onclick="openAdminLoginModal()" style="grid-column: span 3;">Admin Panel</button>
+            <button class="action-btn whatsapp-btn" onclick="openWhatsAppModal()">Send Bill via WhatsApp</button>
         </div>
     </div>
 </div>
@@ -157,7 +151,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modalTitle">List</h3>
-            <span class="close-icon" onclick="closeModal()">✖</span>
+            <span class="close-icon" onclick="closeModal()">X</span>
         </div>
         <div id="modalFilterContainer"></div>
         <div id="modalList"></div>
@@ -166,12 +160,12 @@
 </div>
 
 <div id="calendarModal" class="modal-overlay" style="z-index: 4000;">
-    <div class="modal-content" style="max-width: 320px;">
+    <div class="modal-content" style="max-width: 300px;">
         <div class="calendar-box">
             <div class="cal-header">
-                <button class="cal-nav-btn" onclick="changeCalMonth(-1)">❮</button>
+                <button class="cal-nav-btn" onclick="changeCalMonth(-1)">&lt;</button>
                 <span id="calMonthYearTitle"></span>
-                <button class="cal-nav-btn" onclick="changeCalMonth(1)">❯</button>
+                <button class="cal-nav-btn" onclick="changeCalMonth(1)">&gt;</button>
             </div>
             <div class="cal-grid" id="calDaysGrid"></div>
         </div>
@@ -181,17 +175,17 @@
 
 <div id="alertModal" class="modal-overlay">
     <div class="alert-box">
-        <p id="alertMessage">Notification Message</p>
+        <p id="alertMessage" style="font-size: 13px; font-weight: bold;">Notification</p>
         <button class="alert-ok-btn" onclick="closeAlert()">OK</button>
     </div>
 </div>
 
 <div id="whatsappModal" class="modal-overlay" style="z-index: 3000;">
     <div class="alert-box">
-        <h3 style="margin-top:0; color:#25D366;">Send Bill via WhatsApp</h3>
-        <p style="font-size:12px; color:#555; margin-bottom:8px;">Enter customer's 10-digit mobile number with or without country code:</p>
+        <h3 style="margin-top:0; color:#25D366; font-size:16px;">Send Bill via WhatsApp</h3>
+        <p style="font-size:11px; color:#555; margin-bottom:8px;">Enter customer's 10-digit mobile number:</p>
         <input type="tel" id="whatsappPhoneInput" class="pass-input" placeholder="e.g. 9876543210">
-        <div style="margin-top:5px;">
+        <div>
             <button class="alert-ok-btn" style="background:#25D366;" onclick="sendWhatsAppBill()">Send Now</button>
             <button class="alert-cancel-btn" onclick="closeWhatsAppModal()">Cancel</button>
         </div>
@@ -200,13 +194,13 @@
 
 <div id="passwordModal" class="modal-overlay" style="z-index: 3000;">
     <div class="alert-box">
-        <p style="margin-top:0; font-weight:bold; color:#d32f2f;">Cancel Order Verification</p>
+        <p style="margin-top:0; font-weight:bold; color:#d32f2f; font-size:13px;">Cancel Order Verification</p>
         <div class="password-input-wrapper">
             <input type="password" id="adminPassInput" placeholder="Enter Password">
-            <button type="button" class="eye-btn" onclick="togglePasswordVisibility('adminPassInput', this)">👁️</button>
+            <button type="button" class="eye-btn" onclick="togglePasswordVisibility('adminPassInput', this)">Show</button>
         </div>
         <input type="text" id="adminReasonInput" class="pass-input" placeholder="Reason for cancellation">
-        <div style="margin-top:5px;">
+        <div>
             <button class="alert-ok-btn" onclick="verifyPasswordForCancel()">Confirm Cancel</button>
             <button class="alert-cancel-btn" onclick="closePasswordModal()">Back</button>
         </div>
@@ -215,12 +209,12 @@
 
 <div id="adminLoginModal" class="modal-overlay" style="z-index: 3000;">
     <div class="alert-box">
-        <h3 style="margin-top:0; color:#343a40;">Admin Authentication</h3>
+        <h3 style="margin-top:0; color:#343a40; font-size:15px;">Admin Authentication</h3>
         <div class="password-input-wrapper">
             <input type="password" id="menuAdminPassInput" placeholder="Enter Admin Password">
-            <button type="button" class="eye-btn" onclick="togglePasswordVisibility('menuAdminPassInput', this)">👁️</button>
+            <button type="button" class="eye-btn" onclick="togglePasswordVisibility('menuAdminPassInput', this)">Show</button>
         </div>
-        <div style="margin-top:5px;">
+        <div>
             <button class="alert-ok-btn" onclick="verifyMenuAdminPassword()">Login</button>
             <button class="alert-cancel-btn" onclick="closeAdminLoginModal()">Cancel</button>
         </div>
@@ -229,9 +223,9 @@
 
 <div id="settlementModal" class="modal-overlay">
     <div class="alert-box">
-        <h3 style="margin-top:0; color:#b71c1c;">Daily Sale Settlement</h3>
-        <div id="settlementDetails" style="text-align:left; font-size:12px; margin: 8px 0; background:#f5f5f5; padding:6px; border-radius:5px;"></div>
-        <p style="font-size:12px; color:#555;">Settle current sale session?</p>
+        <h3 style="margin-top:0; color:#b71c1c; font-size:15px;">Daily Sale Settlement</h3>
+        <div id="settlementDetails" style="text-align:left; font-size:11px; margin: 6px 0; background:#f5f5f5; padding:6px; border-radius:4px;"></div>
+        <p style="font-size:11px; color:#555;">Settle current sale session?</p>
         <div>
             <button class="alert-ok-btn" onclick="confirmSettlement()">Confirm Settle</button>
             <button class="alert-cancel-btn" onclick="closeSettlementModal()">Cancel</button>
@@ -304,7 +298,6 @@
         ]
     };
 
-    // Initialize Local Storage Fallback Data if empty
     if (!localStorage.getItem('fuchka_local_menu')) {
         localStorage.setItem('fuchka_local_menu', JSON.stringify(defaultMenu));
     }
@@ -318,7 +311,6 @@
     menuData = JSON.parse(localStorage.getItem('fuchka_local_menu'));
     renderMenu();
 
-    // Check Network Connection Status & Trigger Background Sync
     window.addEventListener('online', () => {
         updateNetworkStatusUI(true);
         syncPendingOrdersToCloud();
@@ -331,14 +323,13 @@
         let statusEl = document.getElementById('syncStatus');
         if (isOnline) {
             statusEl.className = "sync-status status-online";
-            statusEl.innerHTML = "🟢 Online Mode";
+            statusEl.innerHTML = "Online Mode";
         } else {
             statusEl.className = "sync-status status-offline";
-            statusEl.innerHTML = "🔴 Offline Mode";
+            statusEl.innerHTML = "Offline Mode";
         }
     }
 
-    // Firebase Connection Listener
     db.ref('.info/connected').on('value', (snap) => {
         if (snap.val() === true && navigator.onLine) {
             updateNetworkStatusUI(true);
@@ -392,7 +383,6 @@
         });
     }
 
-    // Initial check on load
     if (navigator.onLine) {
         updateNetworkStatusUI(true);
         fetchCloudData();
@@ -429,7 +419,7 @@
         Promise.all(syncPromises).then(() => {
             localStorage.setItem('fuchka_pending_sync_orders', JSON.stringify([]));
             updatePendingSyncBadge();
-            customAlert("⚡ All offline bills successfully synced to cloud!");
+            customAlert("All offline bills successfully synced to cloud!");
         }).catch(err => {
             console.log("Background sync error:", err);
         });
@@ -494,7 +484,7 @@
             let itemTotal = (item.price || 0) * item.qty;
             itemsHTML += `
                 <div class="receipt-item">
-                    <span>• ${item.name}</span>
+                    <span>${item.name}</span>
                     <div class="qty-controls">
                         <button class="qty-btn minus" onclick="decreaseQty(${index})">-</button>
                         <span class="qty-num">${item.qty}</span>
@@ -520,7 +510,6 @@
             total: total
         };
 
-        // Save locally first
         let localOrders = JSON.parse(localStorage.getItem('fuchka_local_orders') || '[]');
         localOrders.push(orderDetails);
         localStorage.setItem('fuchka_local_orders', JSON.stringify(localOrders));
@@ -539,7 +528,7 @@
                 });
         } else {
             queuePendingSync(orderDetails);
-            customAlert('📱 Saved Offline Successfully! Will sync automatically when net connects.');
+            customAlert('Saved Offline Successfully! Will sync automatically when net connects.');
             resetOrder();
         }
     }
@@ -604,12 +593,12 @@
         let inputReason = document.getElementById('adminReasonInput').value.trim();
 
         if (inputPass !== ADMIN_PASSWORD) {
-            customAlert("❌ Incorrect Password! Access Denied.");
+            customAlert("Incorrect Password! Access Denied.");
             return;
         }
 
         if (inputReason === "") {
-            customAlert("⚠️ Please enter a cancellation reason.");
+            customAlert("Please enter a cancellation reason.");
             return;
         }
 
@@ -642,16 +631,16 @@
         let inputField = document.getElementById(inputId);
         if (inputField.type === "password") {
             inputField.type = "text";
-            btn.textContent = "🙈";
+            btn.textContent = "Hide";
         } else {
             inputField.type = "password";
-            btn.textContent = "👁️";
+            btn.textContent = "Show";
         }
     }
 
     function openWhatsAppModal() {
         if (total === 0) {
-            customAlert("⚠️ No items in the current bill to send!");
+            customAlert("No items in the current bill to send!");
             return;
         }
         document.getElementById('whatsappPhoneInput').value = '';
@@ -665,7 +654,7 @@
     function sendWhatsAppBill() {
         let phoneInput = document.getElementById('whatsappPhoneInput').value.trim();
         if (!phoneInput || phoneInput.length < 10) {
-            customAlert("⚠️ Please enter a valid 10-digit mobile number.");
+            customAlert("Please enter a valid 10-digit mobile number.");
             return;
         }
 
@@ -675,17 +664,17 @@
         }
 
         let message = "*--- FUCHKA CAFE BILL ---*\n";
-        message += `📅 Date: ${getTodayString()}\n`;
-        message += `⏰ Time: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}\n\n`;
-        message += "*Items Ordered:*\n";
+        message += `Date: ${getTodayString()}\n`;
+        message += `Time: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}\n\n`;
+        message += "Items Ordered:\n";
         
         currentItems.forEach((item, idx) => {
             let itemTotal = item.price * item.qty;
             message += `${idx + 1}. ${item.name} x${item.qty} - ₹${itemTotal}\n`;
         });
 
-        message += `\n*Total Bill Amount: ₹${total}*\n`;
-        message += "\n_Thank you for visiting Fuchka Cafe! Please visit again._ 🙏";
+        message += `\nTotal Bill Amount: ₹${total}\n`;
+        message += "\nThank you for visiting Fuchka Cafe! Please visit again.";
 
         let encodedMessage = encodeURIComponent(message);
         let whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
@@ -706,7 +695,7 @@
     function verifyMenuAdminPassword() {
         let pass = document.getElementById('menuAdminPassInput').value;
         if (pass !== ADMIN_PASSWORD) {
-            customAlert("❌ Incorrect Password!");
+            customAlert("Incorrect Password!");
             return;
         }
         closeAdminLoginModal();
@@ -714,15 +703,15 @@
     }
 
     function openAdminDashboard() {
-        document.getElementById('modalTitle').innerText = '⚙️ Admin Panel';
+        document.getElementById('modalTitle').innerText = 'Admin Panel';
         document.getElementById('modalFilterContainer').innerHTML = '';
         
         let html = `
-            <div style="background:#f1f3f5; padding:10px; border-radius:6px; margin-bottom:10px;">
-                <b style="font-size:12px; color:#2e7d32;">Add New Menu Item</b>
-                <div class="admin-form-group" style="margin-top:6px;">
+            <div style="background:#f1f3f5; padding:8px; border-radius:6px; margin-bottom:8px;">
+                <b style="font-size:11px; color:#2e7d32;">Add New Menu Item</b>
+                <div class="admin-form-group" style="margin-top:4px;">
                     <label>Category Name:</label>
-                    <input type="text" id="newCatName" placeholder="e.g., BEVERAGES or FRIES ITEM">
+                    <input type="text" id="newCatName" placeholder="e.g., BEVERAGES">
                 </div>
                 <div class="admin-form-group">
                     <label>Item Name:</label>
@@ -732,21 +721,19 @@
                     <label>Price (₹):</label>
                     <input type="number" id="newItemPrice" placeholder="e.g., 60">
                 </div>
-                <button class="action-btn save-btn" style="padding:8px;" onclick="addNewMenuItem()">Add Item</button>
+                <button class="action-btn save-btn" style="padding:6px; font-size:11px;" onclick="addNewMenuItem()">Add Item</button>
             </div>
-            
-            <hr style="border:0; border-top:1px solid #ddd; margin:10px 0;">
-            <b style="font-size:12px; color:#333;">Existing Menu Items (Edit / Delete):</b><br>`;
+            <b style="font-size:11px; color:#333;">Existing Menu Items:</b><br>`;
 
         Object.keys(menuData).forEach(cat => {
-            html += `<div style="font-weight:bold; color:#2e7d32; font-size:12px; margin-top:8px;">📁 ${cat}</div>`;
+            html += `<div style="font-weight:bold; color:#2e7d32; font-size:11px; margin-top:6px;">${cat}</div>`;
             menuData[cat].forEach((item, idx) => {
                 html += `
                     <div class="admin-item-row">
                         <span>${item.name} - <b>₹${item.price}</b></span>
                         <div>
                             <button class="edit-btn" onclick="openEditItemPrompt('${cat}', ${idx})">Edit</button>
-                            <button class="delete-btn" style="padding:2px 6px;" onclick="deleteMenuItem('${cat}', ${idx})">Delete</button>
+                            <button class="delete-btn" onclick="deleteMenuItem('${cat}', ${idx})">Del</button>
                         </div>
                     </div>`;
             });
@@ -762,7 +749,7 @@
         let priceInput = parseFloat(document.getElementById('newItemPrice').value);
 
         if (!catInput || !nameInput || isNaN(priceInput)) {
-            customAlert("⚠️ Please fill all fields correctly.");
+            customAlert("Please fill all fields correctly.");
             return;
         }
 
@@ -777,7 +764,7 @@
         if (navigator.onLine) {
             db.ref('cafeMenu').set(menuData);
         }
-        customAlert("✅ Menu Updated Successfully!");
+        customAlert("Menu Updated Successfully!");
         openAdminDashboard();
     }
 
@@ -792,7 +779,7 @@
         let newPrice = parseFloat(newPriceStr);
 
         if (!newName || isNaN(newPrice)) {
-            customAlert("⚠️ Invalid input values.");
+            customAlert("Invalid input values.");
             return;
         }
 
@@ -804,7 +791,7 @@
         if (navigator.onLine) {
             db.ref('cafeMenu').set(menuData);
         }
-        customAlert("✏️ Item Updated Successfully!");
+        customAlert("Item Updated Successfully!");
         openAdminDashboard();
     }
 
@@ -819,7 +806,7 @@
         if (navigator.onLine) {
             db.ref('cafeMenu').set(menuData);
         }
-        customAlert("🗑️ Item Deleted Successfully!");
+        customAlert("Item Deleted Successfully!");
         openAdminDashboard();
     }
 
@@ -860,7 +847,7 @@
         }
 
         closeSettlementModal();
-        customAlert("Sale Settled Live & Recorded! Active sale reset to ₹0.");
+        customAlert("Sale Settled and Recorded! Active sale reset to ₹0.");
     }
 
     function updateHoldCount() { document.getElementById('holdCount').innerText = heldOrders.length; }
@@ -879,12 +866,11 @@
     function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; }
 
     function showHistory() {
-        document.getElementById('modalTitle').innerText = 'Bill History (By Date)';
+        document.getElementById('modalTitle').innerText = 'Bill History';
         let listDiv = document.getElementById('modalList');
         document.getElementById('modalFilterContainer').innerHTML = '';
         
         let groupedByDate = {};
-
         orders.forEach(ord => {
             let d = ord.date || getTodayString();
             if (!groupedByDate[d]) groupedByDate[d] = [];
@@ -902,9 +888,8 @@
         });
 
         let sortedDates = Object.keys(groupedByDate).sort().reverse();
-
         if (sortedDates.length === 0) {
-            listDiv.innerHTML = '<p style="text-align:center; font-size:12px; color:#777;">No bills recorded yet.</p>';
+            listDiv.innerHTML = '<p style="text-align:center; font-size:11px; color:#777;">No bills recorded yet.</p>';
             document.getElementById('modal').style.display = 'flex';
             return;
         }
@@ -916,27 +901,26 @@
 
             html += `
                 <button class="date-folder-btn" onclick="toggleFolder('folder-${idx}')">
-                    <span>📅 ${dateStr} (${dayBills.length} Bills)</span>
-                    <span>₹${dayTotal} ▾</span>
+                    <span>${dateStr} (${dayBills.length} Bills)</span>
+                    <span>₹${dayTotal} v</span>
                 </button>
                 <div id="folder-${idx}" class="date-folder-content">`;
             
             [...dayBills].reverse().forEach((ord) => {
-                let itemsList = (ord.items || []).map(i => `<li><span>• ${i.name} x${i.qty}</span> <span>₹${i.price * i.qty}</span></li>`).join('');
+                let itemsList = (ord.items || []).map(i => `<li><span>${i.name} x${i.qty}</span> <span>₹${i.price * i.qty}</span></li>`).join('');
                 let isUnsettled = (ord.timestamp || 0) > lastSettledTime;
                 
                 html += `
                     <div class="bill-item" style="background:#fff;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <b>Time: ${ord.time}</b>
-                            ${isUnsettled ? '<span style="color:#d32f2f; font-size:10px; font-weight:bold; background:#ffebee; padding:2px 5px; border-radius:4px;">Unsettled</span>' : '<span style="color:#2e7d32; font-size:10px; font-weight:bold; background:#e8f5e9; padding:2px 5px; border-radius:4px;">Settled</span>'}
+                            ${isUnsettled ? '<span style="color:#d32f2f; font-size:9px; font-weight:bold; background:#ffebee; padding:2px 4px; border-radius:3px;">Unsettled</span>' : '<span style="color:#2e7d32; font-size:9px; font-weight:bold; background:#e8f5e9; padding:2px 4px; border-radius:3px;">Settled</span>'}
                         </div>
                         <ul class="history-item-list">${itemsList}</ul>
                         <div style="color:#2e7d32; font-weight:bold; text-align:right;">Total: ₹${ord.total}</div>
-                        ${isUnsettled ? `<button class="delete-btn" style="width:100%; margin-top:6px;" onclick="openPasswordModal(${ord.id})">Cancel Bill</button>` : ''}
+                        ${isUnsettled ? `<button class="delete-btn" style="width:100%; margin-top:4px;" onclick="openPasswordModal(${ord.id})">Cancel Bill</button>` : ''}
                     </div>`;
             });
-
             html += `</div>`;
         });
 
@@ -946,11 +930,7 @@
 
     function toggleFolder(id) {
         let el = document.getElementById(id);
-        if (el.style.display === "block") {
-            el.style.display = "none";
-        } else {
-            el.style.display = "block";
-        }
+        el.style.display = el.style.display === "block" ? "none" : "block";
     }
 
     function openTotalSaleModal() {
@@ -971,17 +951,16 @@
                 <div class="analytics-title">Custom Date Range Sale</div>
                 <div class="date-picker-grid">
                     <div class="date-field">
-                        <label>From Date:</label>
+                        <label>From:</label>
                         <input type="text" id="startDate" value="${todayStr}" readonly onclick="openCustomCalendar('startDate')">
                     </div>
                     <div class="date-field">
-                        <label>To Date:</label>
+                        <label>To:</label>
                         <input type="text" id="endDate" value="${todayStr}" readonly onclick="openCustomCalendar('endDate')">
                     </div>
                 </div>
                 <button class="btn-calc" onclick="calculateCustomSale()">Show Selected Sale</button>
             </div>
-            
             <div id="customResultArea"></div>`;
         
         document.getElementById('modalFilterContainer').innerHTML = containerHtml;
@@ -1022,12 +1001,8 @@
         document.getElementById('calMonthYearTitle').innerText = `${months[calCurrentMonth]} ${calCurrentYear}`;
 
         let gridHtml = `
-            <div class="cal-day-head">Su</div>
-            <div class="cal-day-head">Mo</div>
-            <div class="cal-day-head">Tu</div>
-            <div class="cal-day-head">We</div>
-            <div class="cal-day-head">Th</div>
-            <div class="cal-day-head">Fr</div>
+            <div class="cal-day-head">Su</div><div class="cal-day-head">Mo</div><div class="cal-day-head">Tu</div>
+            <div class="cal-day-head">We</div><div class="cal-day-head">Th</div><div class="cal-day-head">Fr</div>
             <div class="cal-day-head">Sa</div>`;
 
         let firstDay = new Date(calCurrentYear, calCurrentMonth, 1).getDay();
@@ -1083,11 +1058,11 @@
         let grandTotal = filtered.reduce((acc, curr) => acc + curr.total, 0);
 
         let resultHtml = `
-            <div class="analytics-card" style="background:#e8f5e9; border-color:#c8e6c9;">
+            <div class="analytics-card" style="background:#e8f5e9; border-color:#c8e6c9; margin-top:8px;">
                 <div class="analytics-title" style="color:#2e7d32;">Custom Range Total</div>
                 <div class="analytics-amount">₹${grandTotal}</div>
-                <small style="color:#555;">Range: <b>${startVal}</b> to <b>${endVal}</b></small><br>
-                <small style="color:#555;">Total Bills: <b>${filtered.length}</b></small>
+                <small style="color:#555;">Range: ${startVal} to ${endVal}</small><br>
+                <small style="color:#555;">Total Bills: ${filtered.length}</small>
             </div>`;
 
         document.getElementById('customResultArea').innerHTML = resultHtml;
@@ -1097,11 +1072,11 @@
         document.getElementById('modalTitle').innerText = 'Held Orders';
         let listDiv = document.getElementById('modalList');
         document.getElementById('modalFilterContainer').innerHTML = '';
-        if (heldOrders.length === 0) { listDiv.innerHTML = '<p style="text-align:center;">No held orders.</p>'; } 
+        if (heldOrders.length === 0) { listDiv.innerHTML = '<p style="text-align:center; font-size:11px;">No held orders.</p>'; } 
         else {
             let html = '';
             heldOrders.forEach((ord, index) => {
-                html += `<div class="bill-item"><b>Hold Bill #${index + 1} (${ord.time})</b><div style="color:#d32f2f; font-weight:bold;">Total: ₹${ord.total}</div><div class="btn-group"><button class="restore-btn" onclick="restoreOrder(${index})">Restore</button><button class="defdelete-btn" onclick="deleteHoldOrder(${index})">Delete</button></div></div>`;
+                html += `<div class="bill-item"><b>Hold Bill #${index + 1} (${ord.time})</b><div style="color:#d32f2f; font-weight:bold;">Total: ₹${ord.total}</div><div class="btn-group"><button class="restore-btn" onclick="restoreOrder(${index})">Restore</button><button class="delete-btn" onclick="deleteHoldOrder(${index})">Delete</button></div></div>`;
             });
             listDiv.innerHTML = html;
         }
@@ -1112,15 +1087,11 @@
         document.getElementById('modalTitle').innerText = 'Cancelled Bills';
         let listDiv = document.getElementById('modalList');
         
-        let bannerHtml = `
-            <div class="cancel-banner">
-                Total Cancelled Orders: <b>${cancelledOrders.length}</b>
-            </div>`;
-            
+        let bannerHtml = `<div class="cancel-banner">Total Cancelled Orders: ${cancelledOrders.length}</div>`;
         document.getElementById('modalFilterContainer').innerHTML = bannerHtml;
 
         if (cancelledOrders.length === 0) { 
-            listDiv.innerHTML = '<p style="text-align:center; font-size:12px; color:#777;">No cancelled bills found.</p>'; 
+            listDiv.innerHTML = '<p style="text-align:center; font-size:11px; color:#777;">No cancelled bills found.</p>'; 
         } else {
             let html = '';
             [...cancelledOrders].reverse().forEach((ord) => {
@@ -1137,14 +1108,12 @@
     }
 
     function showSettlementHistory() {
-        document.getElementById('modalTitle').innerText = 'Settlement Ledger History';
+        document.getElementById('modalTitle').innerText = 'Settlement History';
         let listDiv = document.getElementById('modalList');
         document.getElementById('modalFilterContainer').innerHTML = '';
 
-        if (settlementHistory.length ===50 && settlementHistory.length === 0) { // Fix empty check
-            listDiv.innerHTML = '<p style="text-align:center; font-size:12px; color:#777;">No settlement records found.</p>';
-        } else if (settlementHistory.length === 0) {
-            listDiv.innerHTML = '<p style="text-align:center; font-size:12px; color:#777;">No settlement records found.</p>';
+        if (settlementHistory.length === 0) {
+            listDiv.innerHTML = '<p style="text-align:center; font-size:11px; color:#777;">No settlement records found.</p>';
         } else {
             let html = ``;
             [...settlementHistory].reverse().forEach((st) => {
@@ -1152,7 +1121,7 @@
                     <div class="bill-item" style="border-left: 4px solid #b71c1c; background: #fff5f5;">
                         <b style="color:#b71c1c;">Settled Date: ${st.date} (${st.time})</b><br>
                         <span>Total Bills Settled: <b>${st.totalBills}</b></span>
-                        <div style="color:#2e7d32; font-weight:bold; font-size:14px; margin-top:2px;">
+                        <div style="color:#2e7d32; font-weight:bold; font-size:13px; margin-top:2px;">
                             Settled Amount: ₹${st.totalAmount}
                         </div>
                     </div>`;
@@ -1168,6 +1137,7 @@
         document.getElementById('settlementDetails').innerHTML = `<b>Current Session Bills:</b> ${activeOrders.length}<br><b>Current Session Sale:</b> ₹${sessionTotal}`;
         document.getElementById('settlementModal').style.display = 'flex';
     }
+    
     function closeSettlementModal() { document.getElementById('settlementModal').style.display = 'none'; }
 </script>
 </body>
